@@ -43,6 +43,7 @@ def register():
                 cpf=cpf_limpo,
                 idade=idade,
                 data_nascimento=nasc,
+                convenio=form.convenio.data
             )
             db.session.add(novo_paciente)
             db.session.commit()
