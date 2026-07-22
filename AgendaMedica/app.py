@@ -1,11 +1,11 @@
 import os
-from datetime import date
+from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from forms import LoginForm, RegistrationForm
+import click
 from models import Consulta, Medico, Paciente, User, db
 
 load_dotenv()
@@ -43,7 +43,7 @@ def register():
                 cpf=cpf_limpo,
                 idade=idade,
                 data_nascimento=nasc,
-                convenio=form.convenio.data
+                convenio=form.convenio.data,
             )
             db.session.add(novo_paciente)
             db.session.commit()
@@ -82,6 +82,69 @@ def login():
 def agenda():
     return "<p>ja ja sai uma agenda</p>"
 
+@app.cli.command("seed")
+def seed():
+    db.create_all()
+
+    medico1 = Medico.query.filter_by(crm="12345/PB").first()
+    if not medico1:
+        medico1 = Medico(
+            nome="Dr. Roberto Silva", crm="12345/PB", especialidade="Cardiologia"
+        )
+        db.session.add(medico1)
+
+    medico2 = Medico.query.filter_by(crm="67890/PB").first()
+    if not medico2:
+        medico2 = Medico(
+            nome="Dra. Juliana Costa", crm="67890/PB", especialidade="Dermatologia"
+        )
+        db.session.add(medico2)
+
+    db.session.flush()
+
+    email_teste = "paciente@teste.com"
+    user_teste = User.query.filter_by(email=email_teste).first()
+
+    if not user_teste:
+        user_teste = User(
+            email=email_teste, senha=generate_password_hash("123456")
+        )
+        db.session.add(user_teste)
+        db.session.flush()
+
+        paciente_teste = Paciente(
+            user_id=user_teste.id,
+            nome="Paciente Teste",
+            cpf="11122233344",
+            idade=30,
+            data_nascimento=date(1996, 5, 15),
+            convenio="Unimed",
+        )
+        db.session.add(paciente_teste)
+        db.session.flush()
+        print("-> Usuário e Paciente de teste criados.")
+    else:
+        paciente_teste = Paciente.query.filter_by(user_id=user_teste.id).first()
+        print("-> Usuário de teste já existe no banco.")
+
+    if paciente_teste and not Consulta.query.filter_by(paciente_id=paciente_teste.id).first():
+        consulta1 = Consulta(
+            paciente_id=paciente_teste.id,
+            medico_id=medico1.id,
+            status="Agendada",
+            data_hora=datetime.now() + timedelta(days=2, hours=4),
+        )
+        consulta2 = Consulta(
+            paciente_id=paciente_teste.id,
+            medico_id=medico2.id,
+            status="Agendada",
+            data_hora=datetime.now() + timedelta(days=5, hours=2),
+        )
+        db.session.add_all([consulta1, consulta2])
+        print("-> Consultas de teste criadas.")
+
+    db.session.commit()
+    print("Base de dados populada com sucesso!")
 
 if __name__ == "__main__":
     app.run(debug=True)
