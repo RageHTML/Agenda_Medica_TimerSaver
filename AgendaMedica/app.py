@@ -1,7 +1,7 @@
 import os
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -81,6 +81,31 @@ def login():
 @app.route("/agenda")
 def agenda():
     return "<p>ja ja sai uma agenda</p>"
+
+from flask import jsonify
+
+@app.route("/api/agendamentos", methods=["GET"])
+def api_agendamentos():
+    try:
+        consultas = Consulta.query.all()
+        dados = []
+
+        for c in consultas:
+            dados.append({
+                "paciente": c.paciente.nome if c.paciente else "Não informado",
+                "cpf": c.paciente.cpf if c.paciente else "Não informado",
+                "medico": c.medico.nome if c.medico else "Não informado",
+                "especialidade": c.medico.especialidade if c.medico else "Não informado",
+                "data": c.data_hora.strftime("%d/%m/%Y"),
+                "horario": c.data_hora.strftime("%H:%M"),
+                "convenio": c.paciente.convenio if c.paciente else "Particular",
+                "status": c.status
+            })
+
+        return jsonify(dados), 200
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao buscar agendamentos", "detalhes": str(e)}), 500
 
 @app.cli.command("seed")
 def seed():
