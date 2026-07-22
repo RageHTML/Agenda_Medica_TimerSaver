@@ -2,7 +2,8 @@ import os
 from datetime import date
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
-from werkzeug.security import check_password_hash
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from forms import LoginForm, RegistrationForm
 from models import Consulta, Medico, Paciente, User, db
@@ -26,12 +27,34 @@ def register():
     if form.validate_on_submit():
         nasc = form.data_nascimento.data
         idade = date.today().year - nasc.year
+        cpf_limpo = form.cpf.data.replace(".", "").replace("-", "").strip()
 
-        flash("Registro bem-sucedido")
-        return redirect(url_for("login"))
+        try:
+            novo_usuario = User(
+                email=form.email.data,
+                senha=generate_password_hash(form.senha.data),
+            )
+            db.session.add(novo_usuario)
+            db.session.flush()
+
+            novo_paciente = Paciente(
+                user_id=novo_usuario.id,
+                nome=form.nome.data,
+                cpf=cpf_limpo,
+                idade=idade,
+                data_nascimento=nasc,
+            )
+            db.session.add(novo_paciente)
+            db.session.commit()
+
+            flash("Registro bem-sucedido!", "success")
+            return redirect(url_for("login"))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash("Erro: Este e-mail ou CPF já está cadastrado no sistema.", "danger")
 
     return render_template("register.html", form=form)
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
