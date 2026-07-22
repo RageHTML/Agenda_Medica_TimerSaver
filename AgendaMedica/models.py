@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
@@ -32,6 +32,7 @@ class Paciente(db.Model):
     cpf: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
     idade: Mapped[int] = mapped_column(nullable=False)
     data_nascimento: Mapped[date] = mapped_column(nullable=False)
+    convenio: Mapped[str] = mapped_column(nullable=False, index=True, default="Particular")
 
     user: Mapped["User"] = relationship()
 
@@ -52,6 +53,8 @@ class Consulta(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     paciente_id: Mapped[int] = mapped_column(ForeignKey("paciente.id"), nullable=False)
     medico_id: Mapped[int] = mapped_column(ForeignKey("medico.id"), nullable=False)
+    status: Mapped[str] = mapped_column(nullable=False, index=True, default="Agendada")
+    data_hora: Mapped[datetime] = mapped_column(nullable=False)
 
     paciente: Mapped["Paciente"] = relationship()
     medico: Mapped["Medico"] = relationship()
