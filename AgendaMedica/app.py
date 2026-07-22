@@ -1,8 +1,16 @@
 from flask import Flask, request, render_template
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
-@app.route("/register")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "chave-padrao-seguranca")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///meubanco.db")
+
+
+@app.route("/login")
 def hello_world():
     return render_template("register.html")
 
