@@ -31,5 +31,5 @@ def save():
         return render_template("register.html", person=reg)
 
 @app.route("/agenda")
-def login():
+def agenda():
     return "<p>ja ja sai uma agenda</p>"

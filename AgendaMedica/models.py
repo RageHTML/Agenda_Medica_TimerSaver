@@ -48,7 +48,7 @@ class Medico(db.Model):
 
 
 class Consulta(db.Model):
-    __tablename__ = "consulta"  _
+    __tablename__ = "consulta"  
 
     id: Mapped[int] = mapped_column(primary_key=True)
     paciente_id: Mapped[int] = mapped_column(ForeignKey("paciente.id"), nullable=False)
