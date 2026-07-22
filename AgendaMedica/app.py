@@ -8,6 +8,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from forms import RegistrationForm, LoginForm
 import click
 from models import Consulta, Medico, Paciente, User, db
+from threading import Thread
+import logging
 
 load_dotenv()
 
@@ -86,7 +88,7 @@ def agenda():
     try:
         response = requests.get(url_api)
         if response.status_code == 200:
-            agendamentos = response.json()  # Transforma a resposta HTTP em lista/dicionário Python
+            agendamentos = response.json() 
         else:
             agendamentos = []
     except requests.exceptions.RequestException:
@@ -118,6 +120,33 @@ def api_agendamentos():
     except Exception as e:
         return jsonify({"erro": "Erro ao buscar agendamentos", "detalhes": str(e)}), 500
 
+def carregar_dados_terminal():
+    """Função para buscar via HTTP e exibir no terminal usando logging"""
+    import time
+
+    url = "http://127.0.0.1:5000/api/agendamentos"
+    tentativas = 10
+    for tentativa in range(tentativas):
+        try:
+            res = requests.get(url, timeout=2)
+            if res.status_code == 200:
+                dados = res.json()
+                msg = "\n" + "=" * 70 + "\n"
+                msg += "         DADOS DOS AGENDAMENTOS (BUSCADOS VIA API HTTP)\n"
+                msg += "=" * 70 + "\n"
+                for item in dados:
+                    msg += f"Paciente: {item['paciente']} | CPF: {item['cpf']}\n"
+                    msg += f"Médico: {item['medico']} ({item['especialidade']})\n"
+                    msg += f"Data/Hora: {item['data']} às {item['horario']} | Convênio: {item['convenio']} | Status: {item['status']}\n"
+                    msg += "-" * 70 + "\n"
+                msg += "=" * 70 + "\n"
+                logging.info(msg)
+                return
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(1)  
+
+    logging.error("\n[ERRO NA API]: servidor não respondeu após várias tentativas\n")
 
 @app.cli.command("seed")
 def seed():
@@ -183,5 +212,8 @@ def seed():
     db.session.commit()
     print("Base de dados populada com sucesso!")
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    Thread(target=carregar_dados_terminal).start()
+    app.run(debug=True, use_reloader=False, threaded=True)
