@@ -1,10 +1,11 @@
-from flask import Flask, request, render_template, flash, url_for, redirect
-from datetime import date
-from forms import RegistrationForm, LoginForm
-from models import db, User, Paciente, Medico, Consulta
-from werkzeug.security import check_password_hash
-from dotenv import load_dotenv
 import os
+from datetime import date
+from dotenv import load_dotenv
+from flask import Flask, flash, redirect, render_template, request, url_for
+from werkzeug.security import check_password_hash
+
+from forms import LoginForm, RegistrationForm
+from models import Consulta, Medico, Paciente, User, db
 
 load_dotenv()
 
@@ -12,6 +13,11 @@ app = Flask(__name__)
 
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "chave-padrao-seguranca")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///meubanco.db")
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -21,10 +27,11 @@ def register():
         nasc = form.data_nascimento.data
         idade = date.today().year - nasc.year
 
-        flash(f"Registro bem-sucedido para {form.nome.data}, idade: {idade} anos, email: {form.email.data}, CPF: {form.cpf.data}")
-        return redirect(url_for('login'))
-    
+        flash("Registro bem-sucedido")
+        return redirect(url_for("login"))
+
     return render_template("register.html", form=form)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -41,11 +48,16 @@ def login():
             flash("Senha incorreta. Tente novamente.", "danger")
             return render_template("login.html", form=form)
 
-        flash(f"Bem-vindo(a) de volta, {user.nome}!", "success")
+        flash(f"Bem-vindo(a) de volta!", "success")
         return redirect(url_for("agenda"))
 
     return render_template("login.html", form=form)
 
+
 @app.route("/agenda")
 def agenda():
     return "<p>ja ja sai uma agenda</p>"
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

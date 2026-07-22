@@ -1,18 +1,9 @@
 from datetime import date, datetime
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///meubanco.db"
-
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
-db.init_app(app)
-
+db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = "users"
@@ -58,8 +49,3 @@ class Consulta(db.Model):
 
     paciente: Mapped["Paciente"] = relationship()
     medico: Mapped["Medico"] = relationship()
-
-
-
-with app.app_context():
-    db.create_all()
