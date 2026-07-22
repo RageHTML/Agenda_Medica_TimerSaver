@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from models import Paciente, User
-from wtforms import StringField, PasswordField, EmailField, IntegerField, DateField
+from wtforms import StringField, PasswordField, EmailField, IntegerField, DateField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 
 class RegistrationForm(FlaskForm):
@@ -11,7 +11,15 @@ class RegistrationForm(FlaskForm):
     cpf = StringField("CPF", validators=[DataRequired(message='O CPF é obrigatório.'), Length(min=11, max=11)])
     senha = PasswordField("Senha", validators=[DataRequired(message='A senha é obrigatória.'), Length(min=6, max=128, message='A senha deve ter entre 6 e 128 caracteres.')])
     confirmar_senha = PasswordField("Confirmar Senha", validators=[DataRequired(message='A senha é obrigatória.'), EqualTo("senha", message="As senhas devem coincidir.")])
-
+    convenio = SelectField(
+        "Convênio",choices=[
+            ("Particular", "Particular"),
+            ("UNIMED", "Unimed"),
+            ("Bradesco Saude", "Bradesco Saúde"),
+            ("Amil", "Amil"),
+            ("Outro", "Outro"),
+        ],default="Particular", validators=[DataRequired(message="O Convenio e obrigatório")])
+    
     def validate_email(self, field):
         user = User.query.filter_by(email=field.data).first()
         if user:
