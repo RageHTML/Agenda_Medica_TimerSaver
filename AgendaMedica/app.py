@@ -1,10 +1,11 @@
 import os
+import requests
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from forms import RegistrationForm, LoginForm
 import click
 from models import Consulta, Medico, Paciente, User, db
 
@@ -80,9 +81,19 @@ def login():
 
 @app.route("/agenda")
 def agenda():
-    return "<p>ja ja sai uma agenda</p>"
+    url_api = "http://127.0.0.1:5000/api/agendamentos"
+    
+    try:
+        response = requests.get(url_api)
+        if response.status_code == 200:
+            agendamentos = response.json()  # Transforma a resposta HTTP em lista/dicionário Python
+        else:
+            agendamentos = []
+    except requests.exceptions.RequestException:
+        agendamentos = []
 
-from flask import jsonify
+    return render_template("agenda.html", agendamentos=agendamentos)
+
 
 @app.route("/api/agendamentos", methods=["GET"])
 def api_agendamentos():
@@ -106,6 +117,7 @@ def api_agendamentos():
 
     except Exception as e:
         return jsonify({"erro": "Erro ao buscar agendamentos", "detalhes": str(e)}), 500
+
 
 @app.cli.command("seed")
 def seed():
