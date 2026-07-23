@@ -24,35 +24,47 @@ Uma aplicação web moderna para gestão e visualização de agendamentos médic
 
 ---
 
-## ⚙️ 3. Pré-requisitos e Instalação
+## 🐳 3. Como Executar via Docker
 
-### Pré-requisitos
+Para rodar a aplicação completa conteinerizada utilizando o Docker e o Docker Compose, siga os passos abaixo:
 
-* [Python 3.11+](https://www.python.org/) instalado localmente.
-* [Docker Engine](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) (caso queira executar conteinerizado).
-
-### Passo a Passo para Execução com Docker
-
-1. **Clone o repositório:**
-```bash
-git clone https://github.com/RageHTML/Agenda_Medica_TimerSaver.git
-cd Agenda_Medica_TimerSaver
-
-```
+1. **Certifique-se de ter os pré-requisitos instalados:**
+* [Docker Engine](https://docs.docker.com/get-docker/)
+* [Docker Compose](https://docs.docker.com/compose/install/)
 
 
 2. **Configure o arquivo de ambiente:**
-Renomeie o arquivo de exemplo `env-example` para `.env` na raiz do projeto.
-3. **Suba os containers com Docker Compose:**
+Certifique-se de que o arquivo `.env` está devidamente configurado na raiz do projeto a partir do modelo `env-example`.
+3. **Suba os containers da aplicação e do banco de dados:**
 ```bash
 docker compose up --build
 
 ```
 
 
-4. **Acesse no navegador:**
-* **Painel Principal:** [http://localhost:5000/agenda](http://localhost:5000/agenda)
-* **Tela de Login:** [http://localhost:5000/login](http://localhost:5000/login)
+*(Este comando criará e iniciará os serviços do PostgreSQL e da aplicação Flask, aplicando as migrações e o seeding de forma automática).*
+4. **Comandos Úteis do Docker:**
+* **Para rodar em segundo plano (modo detached):**
+```bash
+docker compose up -d --build
+
+```
+
+
+* **Para visualizar os logs em tempo real:**
+```bash
+docker compose logs -f
+
+```
+
+
+* **Para parar e remover os containers:**
+```bash
+docker compose down
+
+```
+
+
 
 
 
