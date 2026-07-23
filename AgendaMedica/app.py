@@ -216,12 +216,15 @@ def seed():
             {"nome": "Dr. Marcelo Vasconcelos", "crm": "77889/PB", "especialidade": "Neurologia"},
         ]
 
+        novos_adicionados = 0
+
         medicos_objetos = []
         for m in medicos_dados:
             medico = Medico.query.filter_by(crm=m["crm"]).first()
             if not medico:
                 medico = Medico(nome=m["nome"], crm=m["crm"], especialidade=m["especialidade"])
                 db.session.add(medico)
+                novos_adicionados += 1
             medicos_objetos.append(medico)
 
         db.session.flush()
@@ -283,6 +286,7 @@ def seed():
                 )
                 db.session.add(paciente)
                 db.session.flush()
+                novos_adicionados += 1
             else:
                 paciente = Paciente.query.filter_by(user_id=user.id).first()
 
@@ -317,14 +321,18 @@ def seed():
                         data_hora=c["data_hora"],
                     )
                     db.session.add(consulta)
+                    novos_adicionados += 1
 
-        db.session.commit()
-        print("✅ Banco de dados populado com sucesso!")
+        if novos_adicionados > 0:
+            db.session.commit()
+            print("✅ Banco de dados populado com sucesso!")
+        else:
+            db.session.rollback()
+            print("ℹ️ O banco de dados já está populado!")
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Erro ao povoar o banco de dados (o banco já foi criado ou ocorreu uma exceção): {e}")
-
+        print(f"❌ Ocorreu uma exceção ao tentar popular o banco de dados: {e}")
 
 if __name__ == "__main__":
     host = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
