@@ -101,12 +101,22 @@ def agenda():
 
 @app.route("/api/agendamentos", methods=["GET"])
 def api_agendamentos():
-    """
-    Endpoint HTTP que simula a integração com uma API de agendamentos.
-    Retorna paciente, CPF, médico, especialidade, data, horário, convênio e status.
-    """
+    termo = (request.args.get("q", default="", type=str) or "").strip()
+
     try:
-        consultas = Consulta.query.all()
+        query = Consulta.query.join(Paciente).join(Medico)
+
+        if termo:
+            termo_like = f"%{termo}%"
+            query = query.filter(
+                db.or_(
+                    Paciente.nome.ilike(termo_like),
+                    Paciente.cpf.ilike(termo_like),
+                    Medico.nome.ilike(termo_like),
+                )
+            )
+
+        consultas = query.all()
         dados = []
 
         for c in consultas:
