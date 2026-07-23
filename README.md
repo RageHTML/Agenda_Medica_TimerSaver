@@ -130,11 +130,13 @@ deactivate
 
 ## 🌱 Povoamento do Banco de Dados (*Database Seeding*)
 
-Ao iniciar os containers via Docker Compose, o sistema executa automaticamente a rotina de **seeding** do banco de dados. Esse processo garante que:
+O sistema conta com um comando dedicado para popular o banco de dados com massa de testes. 
 
-- A estrutura de tabelas e relacionamentos seja criada dinamicamente.
-- Usuários padrão com senhas criptografadas (pacientes e médicos) sejam inseridos.
-- Uma massa inicial de agendamentos fictícios com variados status (*Agendada*, *Confirmada*, *Realizada*, *Cancelada*) esteja disponível imediatamente para navegação.
+Para executá-lo manualmente, certifique-se de estar posicionado no **mesmo diretório onde se encontra o arquivo `app.py`** e com o seu ambiente virtual ativado, em seguida utilize o comando do Flask:
+
+```bash
+flask seed
+```bash
 
 ---
 
