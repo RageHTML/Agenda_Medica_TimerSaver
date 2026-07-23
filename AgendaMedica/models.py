@@ -1,9 +1,10 @@
 from datetime import date, datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -39,7 +40,7 @@ class Medico(db.Model):
 
 
 class Consulta(db.Model):
-    __tablename__ = "consulta"  
+    __tablename__ = "consulta"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     paciente_id: Mapped[int] = mapped_column(ForeignKey("paciente.id"), nullable=False)
