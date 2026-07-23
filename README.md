@@ -15,8 +15,18 @@ Uma aplicação web moderna para gestão e visualização de agendamentos médic
 A **Agenda Médica Web** é uma solução intuitiva projetada para otimizar o fluxo de agendamento e acompanhamento de consultas. O sistema abrange:
 - **Autenticação Segura:** Login e registro de usuários com hash de senha via Werkzeug e proteção contra vulnerabilidades CSRF.
 - **Painel Dinâmico:** Visualização interativa dos agendamentos através de tabelas reativas com filtragem instantânea sem reload.
-- **Integração via API RESTful:** Endpoints expostos para busca e integração com sistemas externos.
+- **Integração via API RESTful:** Endpoints expostos para busca e integração com systems externos.
 - **Povoamento Automático (*Seeding*):** Inicialização do banco de dados com massa de testes pronta para validação imediata.
+
+---
+
+## 🎬 Demonstração da Aplicação
+
+Confira abaixo o funcionamento da interface, navegação e busca reativa da aplicação:
+
+![Demonstração da Agenda Médica](./static/demo.gif)
+
+
 
 ---
 
@@ -118,9 +128,19 @@ deactivate
 
 ---
 
+## 🌱 Povoamento do Banco de Dados (*Database Seeding*)
+
+Ao iniciar os containers via Docker Compose, o sistema executa automaticamente a rotina de **seeding** do banco de dados. Esse processo garante que:
+
+- A estrutura de tabelas e relacionamentos seja criada dinamicamente.
+- Usuários padrão com senhas criptografadas (pacientes e médicos) sejam inseridos.
+- Uma massa inicial de agendamentos fictícios com variados status (*Agendada*, *Confirmada*, *Realizada*, *Cancelada*) esteja disponível imediatamente para navegação.
+
+---
+
 ## 🔑 Credenciais do Usuário de Teste
 
-A aplicação popula automaticamente o banco de dados com dados de teste (*seeding*). Utilize qualquer uma das credenciais abaixo para entrar no sistema:
+Com o povoamento automático (*seeding*) executado na inicialização da aplicação, utilize qualquer uma das credenciais abaixo para testar a autenticação:
 
 | Perfil | E-mail | Senha |
 | :--- | :--- | :--- |
@@ -161,7 +181,7 @@ A aplicação popula automaticamente o banco de dados com dados de teste (*seedi
 ### Decisões Técnicas
 - **Isolamento de Porta PostgreSQL:** Mapeamento da porta externa do banco para `5433:5432` no `docker-compose.yml`, evitando conflitos com instâncias locais do Postgres na máquina do desenvolvedor.
 - **Comunicação Interna de Containers:** O Flask conecta-se ao banco via DNS da rede interna Docker (`db:5432`), abstraindo IPs voláteis.
-- **Prevencao de Cache de Assets (Cache-Busting):** Função utilitária no Flask injetando parâmetros de timestamp (`?v=TIMESTAMP`) em arquivos CSS/JS estáticos.
+- **Prevenção de Cache de Assets (Cache-Busting):** Função utilitária no Flask injetando parâmetros de timestamp (`?v=TIMESTAMP`) em arquivos CSS/JS estáticos.
 
 ### Limitações Conhecidas
 - **Sessões Locais em Cookie:** Uso de *session cookies* nativos do Flask. Em cenários de escalabilidade horizontal com múltiplas instâncias, recomenda-se integrar o **Redis** como backend de sessão.
