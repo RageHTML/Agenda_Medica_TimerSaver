@@ -205,119 +205,125 @@ iniciar_thread_terminal_automatico()
 
 @app.cli.command("seed")
 def seed():
-    db.create_all()
+    try:
+        db.create_all()
 
-    medicos_dados = [
-        {"nome": "Dr. Roberto Silva", "crm": "12345/PB", "especialidade": "Cardiologia"},
-        {"nome": "Dra. Juliana Costa", "crm": "67890/PB", "especialidade": "Dermatologia"},
-        {"nome": "Dr. Fernando Albuquerque", "crm": "11223/PB", "especialidade": "Ortopedia"},
-        {"nome": "Dra. Camila Andrade", "crm": "44556/PB", "especialidade": "Pediatria"},
-        {"nome": "Dr. Marcelo Vasconcelos", "crm": "77889/PB", "especialidade": "Neurologia"},
-    ]
+        medicos_dados = [
+            {"nome": "Dr. Roberto Silva", "crm": "12345/PB", "especialidade": "Cardiologia"},
+            {"nome": "Dra. Juliana Costa", "crm": "67890/PB", "especialidade": "Dermatologia"},
+            {"nome": "Dr. Fernando Albuquerque", "crm": "11223/PB", "especialidade": "Ortopedia"},
+            {"nome": "Dra. Camila Andrade", "crm": "44556/PB", "especialidade": "Pediatria"},
+            {"nome": "Dr. Marcelo Vasconcelos", "crm": "77889/PB", "especialidade": "Neurologia"},
+        ]
 
-    medicos_objetos = []
-    for m in medicos_dados:
-        medico = Medico.query.filter_by(crm=m["crm"]).first()
-        if not medico:
-            medico = Medico(nome=m["nome"], crm=m["crm"], especialidade=m["especialidade"])
-            db.session.add(medico)
-        medicos_objetos.append(medico)
+        medicos_objetos = []
+        for m in medicos_dados:
+            medico = Medico.query.filter_by(crm=m["crm"]).first()
+            if not medico:
+                medico = Medico(nome=m["nome"], crm=m["crm"], especialidade=m["especialidade"])
+                db.session.add(medico)
+            medicos_objetos.append(medico)
 
-    db.session.flush()
+        db.session.flush()
 
-    pacientes_dados = [
-        {
-            "email": "carlos.eduardo@gmail.com",
-            "nome": "Carlos Eduardo Oliveira",
-            "cpf": "12345678901",
-            "nascimento": date(1988, 3, 14),
-            "convenio": "Unimed",
-        },
-        {
-            "email": "mariana.santos@hotmail.com",
-            "nome": "Mariana Santos Ferreira",
-            "cpf": "98765432100",
-            "nascimento": date(1995, 8, 22),
-            "convenio": "Bradesco Saúde",
-        },
-        {
-            "email": "lucas.mendes@yahoo.com.br",
-            "nome": "Lucas Mendes Rocha",
-            "cpf": "45678912344",
-            "nascimento": date(2001, 11, 5),
-            "convenio": "Particular",
-        },
-        {
-            "email": "ana.beatriz@gmail.com",
-            "nome": "Ana Beatriz Lima",
-            "cpf": "78912345688",
-            "nascimento": date(1973, 1, 30),
-            "convenio": "Amil",
-        },
-        {
-            "email": "rafael.alves@outlook.com",
-            "nome": "Rafael Alves Guimarães",
-            "cpf": "32165498711",
-            "nascimento": date(1990, 6, 18),
-            "convenio": "Hapvida",
-        },
-    ]
+        pacientes_dados = [
+            {
+                "email": "carlos.eduardo@gmail.com",
+                "nome": "Carlos Eduardo Oliveira",
+                "cpf": "12345678901",
+                "nascimento": date(1988, 3, 14),
+                "convenio": "Unimed",
+            },
+            {
+                "email": "mariana.santos@hotmail.com",
+                "nome": "Mariana Santos Ferreira",
+                "cpf": "98765432100",
+                "nascimento": date(1995, 8, 22),
+                "convenio": "Bradesco Saúde",
+            },
+            {
+                "email": "lucas.mendes@yahoo.com.br",
+                "nome": "Lucas Mendes Rocha",
+                "cpf": "45678912344",
+                "nascimento": date(2001, 11, 5),
+                "convenio": "Particular",
+            },
+            {
+                "email": "ana.beatriz@gmail.com",
+                "nome": "Ana Beatriz Lima",
+                "cpf": "78912345688",
+                "nascimento": date(1973, 1, 30),
+                "convenio": "Amil",
+            },
+            {
+                "email": "rafael.alves@outlook.com",
+                "nome": "Rafael Alves Guimarães",
+                "cpf": "32165498711",
+                "nascimento": date(1990, 6, 18),
+                "convenio": "Hapvida",
+            },
+        ]
 
-    pacientes_objetos = []
-    for p in pacientes_dados:
-        user = User.query.filter_by(email=p["email"]).first()
-        if not user:
-            user = User(email=p["email"], senha=generate_password_hash("123456"))
-            db.session.add(user)
-            db.session.flush()
+        pacientes_objetos = []
+        for p in pacientes_dados:
+            user = User.query.filter_by(email=p["email"]).first()
+            if not user:
+                user = User(email=p["email"], senha=generate_password_hash("123456"))
+                db.session.add(user)
+                db.session.flush()
 
-            idade_calc = date.today().year - p["nascimento"].year
-            paciente = Paciente(
-                user_id=user.id,
-                nome=p["nome"],
-                cpf=p["cpf"],
-                idade=idade_calc,
-                data_nascimento=p["nascimento"],
-                convenio=p["convenio"],
-            )
-            db.session.add(paciente)
-            db.session.flush()
-        else:
-            paciente = Paciente.query.filter_by(user_id=user.id).first()
+                idade_calc = date.today().year - p["nascimento"].year
+                paciente = Paciente(
+                    user_id=user.id,
+                    nome=p["nome"],
+                    cpf=p["cpf"],
+                    idade=idade_calc,
+                    data_nascimento=p["nascimento"],
+                    convenio=p["convenio"],
+                )
+                db.session.add(paciente)
+                db.session.flush()
+            else:
+                paciente = Paciente.query.filter_by(user_id=user.id).first()
 
-        pacientes_objetos.append(paciente)
+            pacientes_objetos.append(paciente)
 
-    consultas_dados = [
-        {"p_idx": 0, "m_idx": 0, "data_hora": datetime(2026, 8, 10, 8, 30), "status": "Confirmada"},
-        {"p_idx": 1, "m_idx": 1, "data_hora": datetime(2026, 8, 10, 10, 0), "status": "Agendada"},
-        {"p_idx": 2, "m_idx": 2, "data_hora": datetime(2026, 8, 11, 14, 15), "status": "Realizada"},
-        {"p_idx": 3, "m_idx": 3, "data_hora": datetime(2026, 8, 12, 11, 30), "status": "Agendada"},
-        {"p_idx": 4, "m_idx": 4, "data_hora": datetime(2026, 8, 13, 16, 0), "status": "Cancelada"},
-        {"p_idx": 0, "m_idx": 1, "data_hora": datetime(2026, 8, 18, 9, 0), "status": "Agendada"},
-        {"p_idx": 1, "m_idx": 3, "data_hora": datetime(2026, 8, 20, 15, 45), "status": "Confirmada"},
-    ]
+        consultas_dados = [
+            {"p_idx": 0, "m_idx": 0, "data_hora": datetime(2026, 8, 10, 8, 30), "status": "Confirmada"},
+            {"p_idx": 1, "m_idx": 1, "data_hora": datetime(2026, 8, 10, 10, 0), "status": "Agendada"},
+            {"p_idx": 2, "m_idx": 2, "data_hora": datetime(2026, 8, 11, 14, 15), "status": "Realizada"},
+            {"p_idx": 3, "m_idx": 3, "data_hora": datetime(2026, 8, 12, 11, 30), "status": "Agendada"},
+            {"p_idx": 4, "m_idx": 4, "data_hora": datetime(2026, 8, 13, 16, 0), "status": "Cancelada"},
+            {"p_idx": 0, "m_idx": 1, "data_hora": datetime(2026, 8, 18, 9, 0), "status": "Agendada"},
+            {"p_idx": 1, "m_idx": 3, "data_hora": datetime(2026, 8, 20, 15, 45), "status": "Confirmada"},
+        ]
 
-    for c in consultas_dados:
-        paciente_obj = pacientes_objetos[c["p_idx"]]
-        medico_obj = medicos_objetos[c["m_idx"]]
+        for c in consultas_dados:
+            paciente_obj = pacientes_objetos[c["p_idx"]]
+            medico_obj = medicos_objetos[c["m_idx"]]
 
-        if paciente_obj and medico_obj:
-            existente = Consulta.query.filter_by(
-                paciente_id=paciente_obj.id,
-                medico_id=medico_obj.id,
-                data_hora=c["data_hora"],
-            ).first()
-
-            if not existente:
-                consulta = Consulta(
+            if paciente_obj and medico_obj:
+                existente = Consulta.query.filter_by(
                     paciente_id=paciente_obj.id,
                     medico_id=medico_obj.id,
-                    status=c["status"],
                     data_hora=c["data_hora"],
-                )
-                db.session.add(consulta)
+                ).first()
 
-    db.session.commit()
+                if not existente:
+                    consulta = Consulta(
+                        paciente_id=paciente_obj.id,
+                        medico_id=medico_obj.id,
+                        status=c["status"],
+                        data_hora=c["data_hora"],
+                    )
+                    db.session.add(consulta)
+
+        db.session.commit()
+        print("✅ Banco de dados populado com sucesso!")
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Erro ao povoar o banco de dados (o banco já foi criado ou ocorreu uma exceção): {e}")
 
 
 if __name__ == "__main__":
