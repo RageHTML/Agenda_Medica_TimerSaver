@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Agendamentos</title>
+
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/agenda.css') }}">
+</head>
+<body>
+
+    <div class="table-container">
+        <h1>Agendamentos de Consultas</h1>
+        <p>Dados carregados através da integração HTTP/API.</p>
+
+        <div class="toolbar">
+            <label for="busca-agendamentos">Buscar:</label>
+            <input
+                type="text"
+                id="busca-agendamentos"
+                placeholder="Filtrar por paciente, CPF ou médico..."
+            >
+        </div>
+
+        <div id="tabela-agendamentos"></div>
+    </div>
+
+    <script>
+        // Dados vindos da API (via /agenda -> /api/agendamentos) injetados pelo Flask
+        window.AGENDAMENTOS_DATA = {{ agendamentos | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/agenda.js') }}"></script>
+
+</body>
+</html>

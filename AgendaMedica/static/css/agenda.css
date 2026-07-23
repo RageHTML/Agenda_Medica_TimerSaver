@@ -1,0 +1,91 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+.table-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.toolbar label {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+#busca-agendamentos {
+    flex: 1;
+    max-width: 320px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+#busca-agendamentos:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Cabeçalho da tabela no mesmo estilo do design original */
+.tabulator .tabulator-header {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    background-color: #3498db;
+    color: #fff;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tabulator-row.tabulator-row-even {
+    background-color: #fafafa;
+}
+
+.tabulator-row:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #fff;
+    display: inline-block;
+}
+
+.status-agendada {
+    background-color: #2ecc71;
+}
+
+.status-cancelada {
+    background-color: #e74c3c;
+}
+
+.status-concluida {
+    background-color: #7f8c8d;
+}
+
+.tabulator-placeholder span {
+    color: #7f8c8d;
+    font-style: italic;
+}

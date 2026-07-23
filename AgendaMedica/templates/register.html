@@ -8,6 +8,16 @@
 
     <h2>Criar Conta</h2>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <form method="POST" action="" novalidate>
 
         {{ form.hidden_tag() }}
@@ -80,12 +90,14 @@
             {% endfor %}
         </div>
 
-        </br>
+        <br>
 
         <div>
             <button type="submit">Cadastrar</button>
         </div>
     </form>
+
+    <p>Já tem conta? <a href="{{ url_for('login') }}">Faça login</a></p>
 
 </body>
 </html>
