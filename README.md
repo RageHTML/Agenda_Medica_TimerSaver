@@ -134,9 +134,9 @@ O sistema conta com um comando dedicado para popular o banco de dados com massa 
 
 Para executá-lo manualmente, certifique-se de estar posicionado no **mesmo diretório onde se encontra o arquivo `app.py`** e com o seu ambiente virtual ativado, em seguida utilize o comando do Flask:
 
-```bash
+```
 flask seed
-```bash
+```
 
 ---
 
