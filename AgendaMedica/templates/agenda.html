@@ -29,7 +29,7 @@
     </div>
 
     <script>
-        window.AGENDAMENTOS_DATA = JSON.parse('{{ agendamentos | tojson | safe }}');
+        window.AGENDAMENTOS_DATA = {{ agendamentos | tojson | safe }};
     </script>
     <script src="{{ static_url('js/agenda.js') }}"></script>
 

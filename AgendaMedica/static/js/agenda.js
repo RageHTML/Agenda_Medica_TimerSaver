@@ -8,8 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function formatarStatus(cell) {
-        var valor = cell.getValue() || "";
-        var classe = "status-badge status-" + normalizar(valor).replace(/\s+/g, "-");
+        var valor = cell.getValue();
+        if (!valor || valor.trim() === "") {
+            valor = "Agendada";
+        }
+        
+        var classe = "status-badge status-" + normalizar(valor).trim().replace(/\s+/g, "-");
         return '<span class="' + classe + '">' + valor + "</span>";
     }
 
