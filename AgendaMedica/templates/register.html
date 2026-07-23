@@ -2,102 +2,91 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Agenda Médica</title>
+    <link rel="stylesheet" href="{{ static_url('css/register.css') }}">
 </head>
 <body>
 
-    <h2>Criar Conta</h2>
+    <div class="auth-container">
+        <h2>Criar Conta</h2>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="" novalidate>
-
-        {{ form.hidden_tag() }}
-
-        <div>
-            {{ form.nome.label }}<br>
-            {{ form.nome(placeholder="Seu nome completo") }}
-            {% for error in form.nome.errors %}
-                <span style="color: red;">[{{ error }}]</span>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-message flash-{{ category }}">
+                {{ message }}
+              </div>
             {% endfor %}
-        </div>
+          {% endif %}
+        {% endwith %}
 
-        <br>
+        <form method="POST" action="" novalidate>
+            {{ form.hidden_tag() }}
 
-        <div>
-            {{ form.data_nascimento.label }}<br>
-            {{ form.data_nascimento(type="date") }}
-            {% for error in form.data_nascimento.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
+            <div class="form-group">
+                {{ form.nome.label }}
+                {{ form.nome(placeholder="Seu nome completo") }}
+                {% for error in form.nome.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <br>
+            <div class="form-group">
+                {{ form.data_nascimento.label }}
+                {{ form.data_nascimento(type="date") }}
+                {% for error in form.data_nascimento.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.email.label }}<br>
-            {{ form.email(placeholder="exemplo@email.com") }}
-            {% for error in form.email.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(placeholder="exemplo@email.com") }}
+                {% for error in form.email.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <br>
+            <div class="form-group">
+                {{ form.cpf.label }}
+                {{ form.cpf(placeholder="Apenas números") }}
+                {% for error in form.cpf.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.cpf.label }}<br>
-            {{ form.cpf(placeholder="Apenas números") }}
-            {% for error in form.cpf.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
+            <div class="form-group">
+                {{ form.senha.label }}
+                {{ form.senha(placeholder="Sua senha") }}
+                {% for error in form.senha.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <br>
+            <div class="form-group">
+                {{ form.confirmar_senha.label }}
+                {{ form.confirmar_senha(placeholder="Confirme a senha") }}
+                {% for error in form.confirmar_senha.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.senha.label }}<br>
-            {{ form.senha() }}
-            {% for error in form.senha.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
+            <div class="form-group">
+                {{ form.convenio.label }}
+                {{ form.convenio() }}
+                {% for error in form.convenio.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
 
-        <br>
+            <button type="submit" class="btn-submit">Cadastrar</button>
+        </form>
 
-        <div>
-            {{ form.confirmar_senha.label }}<br>
-            {{ form.confirmar_senha() }}
-            {% for error in form.confirmar_senha.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-
-        <br>
-
-        <div>
-            {{ form.convenio.label }}<br>
-            {{ form.convenio() }}
-            {% for error in form.convenio.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-
-        <br>
-
-        <div>
-            <button type="submit">Cadastrar</button>
-        </div>
-    </form>
-
-    <p>Já tem conta? <a href="{{ url_for('login') }}">Faça login</a></p>
+        <p class="auth-footer">
+            Já tem conta? <a href="{{ url_for('login') }}">Faça login</a>
+        </p>
+    </div>
 
 </body>
 </html>

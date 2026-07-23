@@ -17,7 +17,7 @@ body {
 
 .auth-container {
     width: 100%;
-    max-width: 420px;
+    max-width: 480px;
     background-color: #1e293b;
     border-radius: 12px;
     padding: 2.5rem 2rem;
@@ -58,11 +58,11 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.15rem;
 }
 
 .form-group label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #94a3b8;
     margin-bottom: 0.4rem;
@@ -72,11 +72,13 @@ body {
 
 .form-group input[type="text"],
 .form-group input[type="email"],
-.form-group input[type="password"] {
+.form-group input[type="password"],
+.form-group input[type="date"],
+.form-group select {
     background-color: #0f172a;
     border: 2px solid #475569;
     color: #ffffff;
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 0.9rem;
     border-radius: 6px;
     font-size: 0.95rem;
     outline: none;
@@ -87,9 +89,24 @@ body {
     color: #64748b;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    background-color: #0f172a;
+    color: #ffffff;
 }
 
 .error-message {
@@ -110,7 +127,7 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .btn-submit:hover {
