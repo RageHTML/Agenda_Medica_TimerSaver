@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "chave-padrao-seguranca")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or "chave-padrao-seguranca"
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///meubanco.db")
 
 db.init_app(app)
