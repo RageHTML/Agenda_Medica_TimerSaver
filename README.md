@@ -102,7 +102,7 @@ Caso queira alterar a `SECRET_KEY` no seu arquivo `.env` por uma chave aleatóri
 
 1. **Clone o repositório:**
    ```bash
-   git clone <URL_DO_SEU_REPOSITORIO>
+   git clone https://github.com/RageHTML/Agenda_Medica_TimerSaver
    cd AgendaMedica
    ```
 
