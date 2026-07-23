@@ -13,7 +13,13 @@ Uma aplicação web moderna para gestão e visualização de agendamentos médic
 
 ---
 
-## 🛠️ 2. Tecnologias Utilizadas
+## 🎬 2. Demonstração da Aplicação
+
+Confira abaixo o funcionamento da interface, navegação e busca reativa da aplicação:
+
+---
+
+## 🛠️ 3. Tecnologias Utilizadas
 
 | Camada | Tecnologias / Bibliotecas |
 | --- | --- |
@@ -24,7 +30,7 @@ Uma aplicação web moderna para gestão e visualização de agendamentos médic
 
 ---
 
-## ⚙️ 3. Pré-requisitos e Configuração do Ambiente (.env)
+## ⚙️ 4. Pré-requisitos e Configuração do Ambiente (.env)
 
 Antes de executar a aplicação, é necessário configurar as variáveis de ambiente renomeando o arquivo de exemplo.
 
@@ -75,7 +81,7 @@ deactivate
 
 ---
 
-## 🐳 4. Como Executar via Docker
+## 🐳 5. Como Executar via Docker
 
 Para rodar a aplicação completa conteinerizada utilizando o Docker e o Docker Compose, siga os passos abaixo:
 
@@ -97,7 +103,7 @@ docker compose up --build
 
 ---
 
-## 🌐 5. Rotas e Acesso à Aplicação
+## 🌐 6. Rotas e Acesso à Aplicação
 
 Assim que a aplicação estiver rodando, você poderá acessar as principais rotas e endpoints através da tabela abaixo:
 
@@ -111,7 +117,7 @@ Assim que a aplicação estiver rodando, você poderá acessar as principais rot
 
 ---
 
-## 🌱 6. Como Popular o Banco de Dados (Flask Seed)
+## 🌱 7. Como Popular o Banco de Dados (Flask Seed)
 
 O sistema conta com um comando dedicado para popular o banco de dados com massa de testes.
 
@@ -124,7 +130,7 @@ flask seed
 
 ---
 
-## 🧪 7. Como Executar os Testes Automatizados (Pytest)
+## 🧪 8. Como Executar os Testes Automatizados (Pytest)
 
 O projeto possui uma suíte de testes automatizados utilizando **Pytest** e o cliente de testes integrado do Flask (`app.test_client()`), operando sobre um banco de dados em memória (`SQLite`).
 
@@ -148,8 +154,11 @@ pytest -s
 
 ---
 
-## 📌 8. Considerações Finais / Autor
+## 📌 9. Considerações Finais / Autor
 
 Projeto desenvolvido com foco em boas práticas de desenvolvimento web backend em Python, testes automatizados e arquitetura conteinerizada.
+
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Perfil-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/deyvid-martins/)
 
 * Desenvolvido por **Rage** / Repositório Oficial do Projeto.
