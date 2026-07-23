@@ -15,7 +15,7 @@ Uma aplicação web moderna para gestão e visualização de agendamentos médic
 
 ## 🎬 2. Demonstração da Aplicação
 
-Confira abaixo o funcionamento da interface, navegação e busca reativa da aplicação (arquivo localizado em `static/demo.gif`):
+Confira abaixo o funcionamento da interface, navegação e busca reativa da aplicação 
 
 ![Demonstração da Agenda Médica](./static/demo.gif)
 
