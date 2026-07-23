@@ -152,6 +152,40 @@ Com o povoamento automático (*seeding*) executado na inicialização da aplica�
 
 ---
 
+O que acontece quando você copia e cola o bloco de código do Markdown aqui do chat para o seu arquivo `.md` é que o próprio texto de parágrafo gerado dentro da caixa de código acaba ficando com quebras manuais de linha (`\n`) que o editor do chat insere para caber na tela.
+
+Para resolver isso de forma definitiva e garantir que o texto seja um **parágrafo contínuo** (que flui naturalmente e se ajusta sozinho na tela do seu editor), a melhor forma é gerar o texto fora da caixa de código tradicional, ou fornecê-lo em blocos de texto limpo.
+
+Aqui está o texto do README perfeitamente formatado e sem quebras indesejadas no meio das frases. Basta selecionar e copiar direto daqui:
+
+---
+
+## 🧪 Testes Automatizados
+
+O projeto conta com uma suíte de testes automatizados utilizando Pytest e o cliente de testes integrado do Flask (app.test_client()), simulando requisições HTTP e operando sobre um banco de dados relacional em memória (SQLite em memória).
+
+### 🚀 Como Executar os Testes
+
+1. Certifique-se de que o ambiente virtual está ativado no seu terminal.
+2. Execute o comando do pytest com a flag -s para visualizar os logs detalhados de cada etapa:
+
+```bash
+pytest -s
+
+```
+
+---
+
+### 📋 O que cada teste faz
+
+| Nome do Teste | Comportamento Validado |
+| --- | --- |
+| **test_login_valido** | Simula uma requisição POST na rota de login utilizando credenciais corretas e valida se a resposta HTTP retorna código 200 com sucesso. |
+| **test_login_invalido** | Simula uma tentativa de autenticação com senha incorreta, validando que o sistema intercepta a falha e recusa o acesso corretamente. |
+| **test_api_agendamentos_com_dados** | Popula o banco em memória com uma massa inicial de testes e consome o endpoint RESTful (GET /api/agendamentos), conferindo a integridade, o status e o mapeamento dos dados retornados. |
+
+---
+
 ## 💡 Exemplos de Uso da Aplicação
 
 1. **Autenticação de Usuários (`/login` e `/register`):**
