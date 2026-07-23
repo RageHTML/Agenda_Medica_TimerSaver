@@ -1,17 +1,21 @@
 import os
-import requests
+import time
+import logging
 from datetime import date, datetime, timedelta
+from threading import Thread
+
+import requests
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from forms import RegistrationForm, LoginForm
-import click
 from models import Consulta, Medico, Paciente, User, db
-from threading import Thread
-import logging
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 app = Flask(__name__)
 
@@ -60,6 +64,7 @@ def register():
 
     return render_template("register.html", form=form)
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -75,7 +80,7 @@ def login():
             flash("Senha incorreta. Tente novamente.", "danger")
             return render_template("login.html", form=form)
 
-        flash(f"Bem-vindo(a) de volta!", "success")
+        flash("Bem-vindo(a) de volta!", "success")
         return redirect(url_for("agenda"))
 
     return render_template("login.html", form=form)
@@ -83,14 +88,11 @@ def login():
 
 @app.route("/agenda")
 def agenda():
-    url_api = "http://127.0.0.1:5000/api/agendamentos"
-    
+    url_api = url_for("api_agendamentos", _external=True)
+
     try:
-        response = requests.get(url_api)
-        if response.status_code == 200:
-            agendamentos = response.json() 
-        else:
-            agendamentos = []
+        response = requests.get(url_api, timeout=5)
+        agendamentos = response.json() if response.status_code == 200 else []
     except requests.exceptions.RequestException:
         agendamentos = []
 
@@ -99,6 +101,10 @@ def agenda():
 
 @app.route("/api/agendamentos", methods=["GET"])
 def api_agendamentos():
+    """
+    Endpoint HTTP que simula a integração com uma API de agendamentos.
+    Retorna paciente, CPF, médico, especialidade, data, horário, convênio e status.
+    """
     try:
         consultas = Consulta.query.all()
         dados = []
@@ -112,7 +118,7 @@ def api_agendamentos():
                 "data": c.data_hora.strftime("%d/%m/%Y"),
                 "horario": c.data_hora.strftime("%H:%M"),
                 "convenio": c.paciente.convenio if c.paciente else "Particular",
-                "status": c.status
+                "status": c.status,
             })
 
         return jsonify(dados), 200
@@ -120,13 +126,21 @@ def api_agendamentos():
     except Exception as e:
         return jsonify({"erro": "Erro ao buscar agendamentos", "detalhes": str(e)}), 500
 
-def carregar_dados_terminal():
-    """Função para buscar via HTTP e exibir no terminal usando logging"""
-    import time
 
+def carregar_dados_terminal():
+    """
+    Requisito do desafio: 'A aplicação deverá entregar os dados quando iniciada
+    pelo terminal'. Busca os agendamentos via HTTP (mesmo endpoint usado pela
+    página /agenda) e exibe no terminal assim que o servidor estiver de pé.
+
+    Usa retry com pequenos intervalos em vez de um sleep fixo, porque o
+    momento exato em que o servidor Flask termina de subir pode variar.
+    """
     url = "http://127.0.0.1:5000/api/agendamentos"
-    tentativas = 10
-    for tentativa in range(tentativas):
+    max_tentativas = 15
+    intervalo_segundos = 1
+
+    for tentativa in range(1, max_tentativas + 1):
         try:
             res = requests.get(url, timeout=2)
             if res.status_code == 200:
@@ -134,22 +148,32 @@ def carregar_dados_terminal():
                 msg = "\n" + "=" * 70 + "\n"
                 msg += "         DADOS DOS AGENDAMENTOS (BUSCADOS VIA API HTTP)\n"
                 msg += "=" * 70 + "\n"
+                if not dados:
+                    msg += "Nenhum agendamento cadastrado no momento.\n"
                 for item in dados:
                     msg += f"Paciente: {item['paciente']} | CPF: {item['cpf']}\n"
                     msg += f"Médico: {item['medico']} ({item['especialidade']})\n"
-                    msg += f"Data/Hora: {item['data']} às {item['horario']} | Convênio: {item['convenio']} | Status: {item['status']}\n"
+                    msg += (
+                        f"Data/Hora: {item['data']} às {item['horario']} | "
+                        f"Convênio: {item['convenio']} | Status: {item['status']}\n"
+                    )
                     msg += "-" * 70 + "\n"
                 msg += "=" * 70 + "\n"
                 logging.info(msg)
                 return
         except requests.exceptions.RequestException:
             pass
-        time.sleep(1)  
 
-    logging.error("\n[ERRO NA API]: servidor não respondeu após várias tentativas\n")
+        time.sleep(intervalo_segundos)
+
+    logging.error(
+        "\n[ERRO NA API]: servidor não respondeu em %s tentativas\n" % max_tentativas
+    )
+
 
 @app.cli.command("seed")
 def seed():
+    """Popula o banco com dados de teste (médicos, usuário, paciente e consultas)."""
     db.create_all()
 
     medico1 = Medico.query.filter_by(crm="12345/PB").first()
@@ -172,9 +196,7 @@ def seed():
     user_teste = User.query.filter_by(email=email_teste).first()
 
     if not user_teste:
-        user_teste = User(
-            email=email_teste, senha=generate_password_hash("123456")
-        )
+        user_teste = User(email=email_teste, senha=generate_password_hash("123456"))
         db.session.add(user_teste)
         db.session.flush()
 
@@ -211,9 +233,26 @@ def seed():
 
     db.session.commit()
     print("Base de dados populada com sucesso!")
+    print(f"-> Login de teste: {email_teste} / senha: 123456")
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+def _deve_iniciar_thread_terminal() -> bool:
+    """
+    Evita que a thread de terminal seja disparada duas vezes quando o
+    reloader do Flask (debug=True) reinicia o processo. O Werkzeug seta
+    WERKZEUG_RUN_MAIN=true apenas no processo "real" que atende requisições.
+    Quando use_reloader=False (padrão aqui), essa variável não existe e a
+    thread sobe normalmente na primeira (e única) execução.
+    """
+    return os.environ.get("WERKZEUG_RUN_MAIN") != "false"
+
 
 if __name__ == "__main__":
-    Thread(target=carregar_dados_terminal).start()
-    app.run(debug=True, use_reloader=False, threaded=True)
+    host = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
+    port = int(os.getenv("FLASK_RUN_PORT", "5000"))
+    debug = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+
+    if _deve_iniciar_thread_terminal():
+        Thread(target=carregar_dados_terminal, daemon=True).start()
+
+    app.run(host=host, port=port, debug=debug, use_reloader=False, threaded=True)
