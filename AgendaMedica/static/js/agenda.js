@@ -15,11 +15,15 @@ document.addEventListener("DOMContentLoaded", function () {
         return '<span class="' + classe + '">' + valor + "</span>";
     }
 
+    var PLACEHOLDER_PADRAO = "Nenhum agendamento encontrado.";
+    var PLACEHOLDER_SEM_RESULTADO = "Nenhum registro encontrado para essa busca.";
+    var PLACEHOLDER_ERRO_BUSCA = "Não foi possível buscar agora. Tente novamente.";
+
     var table = new Tabulator("#tabela-agendamentos", {
         data: dados,
         layout: "fitColumns",
         responsiveLayout: "collapse",
-        placeholder: "Nenhum agendamento encontrado.",
+        placeholder: PLACEHOLDER_PADRAO,
         columns: [
             { title: "Data", field: "data", width: 110, sorter: "date", sorterParams: { format: "dd/MM/yyyy" } },
             { title: "Horário", field: "horario", width: 90 },
@@ -38,24 +42,45 @@ document.addEventListener("DOMContentLoaded", function () {
         ],
     });
 
-    // Busca única que filtra por paciente, CPF ou médico simultaneamente
     var campoBusca = document.getElementById("busca-agendamentos");
+    var debounceTimer = null;
+
+    function buscarAgendamentos(termoOriginal) {
+        var termo = (termoOriginal || "").trim();
+
+        if (!termo) {
+            table.setData(dados);
+            table.setPlaceholder(PLACEHOLDER_PADRAO);
+            return;
+        }
+
+        var url = "/api/agendamentos?q=" + encodeURIComponent(termo);
+
+        fetch(url)
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error("Resposta inválida do servidor: " + resposta.status);
+                }
+                return resposta.json();
+            })
+            .then(function (resultado) {
+                table.setPlaceholder(PLACEHOLDER_SEM_RESULTADO);
+                table.setData(Array.isArray(resultado) ? resultado : []);
+            })
+            .catch(function () {
+                table.setPlaceholder(PLACEHOLDER_ERRO_BUSCA);
+                table.setData([]);
+            });
+    }
+
     if (campoBusca) {
         campoBusca.addEventListener("input", function () {
-            var termo = normalizar(campoBusca.value);
+            var valor = campoBusca.value;
 
-            if (!termo) {
-                table.clearFilter();
-                return;
-            }
-
-            table.setFilter(function (linha) {
-                return (
-                    normalizar(linha.paciente).indexOf(termo) !== -1 ||
-                    normalizar(linha.cpf).indexOf(termo) !== -1 ||
-                    normalizar(linha.medico).indexOf(termo) !== -1
-                );
-            });
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                buscarAgendamentos(valor);
+            }, 300);
         });
     }
 });
