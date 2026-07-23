@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var dados = window.AGENDAMENTOS_DATA || [];
-
     function normalizar(texto) {
         return (texto || "")
             .toString()
@@ -15,15 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return '<span class="' + classe + '">' + valor + "</span>";
     }
 
-    var PLACEHOLDER_PADRAO = "Nenhum agendamento encontrado.";
-    var PLACEHOLDER_SEM_RESULTADO = "Nenhum registro encontrado para essa busca.";
-    var PLACEHOLDER_ERRO_BUSCA = "Não foi possível buscar agora. Tente novamente.";
-
     var table = new Tabulator("#tabela-agendamentos", {
-        data: dados,
+        data: window.AGENDAMENTOS_DATA || [],
         layout: "fitColumns",
         responsiveLayout: "collapse",
-        placeholder: PLACEHOLDER_PADRAO,
+        placeholder: "Nenhum registro encontrado.",
         columns: [
             { title: "Data", field: "data", width: 110, sorter: "date", sorterParams: { format: "dd/MM/yyyy" } },
             { title: "Horário", field: "horario", width: 90 },
@@ -45,42 +39,41 @@ document.addEventListener("DOMContentLoaded", function () {
     var campoBusca = document.getElementById("busca-agendamentos");
     var debounceTimer = null;
 
-    function buscarAgendamentos(termoOriginal) {
-        var termo = (termoOriginal || "").trim();
-
-        if (!termo) {
-            table.setData(dados);
-            table.setPlaceholder(PLACEHOLDER_PADRAO);
-            return;
-        }
-
+    function executarBuscaAPI(termo) {
         var url = "/api/agendamentos?q=" + encodeURIComponent(termo);
 
         fetch(url)
             .then(function (resposta) {
-                if (!resposta.ok) {
-                    throw new Error("Resposta inválida do servidor: " + resposta.status);
-                }
                 return resposta.json();
             })
-            .then(function (resultado) {
-                table.setPlaceholder(PLACEHOLDER_SEM_RESULTADO);
-                table.setData(Array.isArray(resultado) ? resultado : []);
+            .then(function (dados) {
+                if (Array.isArray(dados) && dados.length > 0) {
+                    table.setData(dados);
+                } else {
+                    table.clearData();
+                }
             })
             .catch(function () {
-                table.setPlaceholder(PLACEHOLDER_ERRO_BUSCA);
-                table.setData([]);
+                table.clearData();
             });
     }
 
     if (campoBusca) {
         campoBusca.addEventListener("input", function () {
-            var valor = campoBusca.value;
+            var valor = campoBusca.value.trim();
 
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
-                buscarAgendamentos(valor);
+                executarBuscaAPI(valor);
             }, 300);
+        });
+
+        campoBusca.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                clearTimeout(debounceTimer);
+                executarBuscaAPI(campoBusca.value.trim());
+            }
         });
     }
 });

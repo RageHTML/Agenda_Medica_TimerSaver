@@ -1,16 +1,17 @@
+import logging
 import os
 import time
-import logging
 from datetime import date, datetime, timedelta
 from threading import Thread
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from forms import RegistrationForm, LoginForm
+from forms import LoginForm, RegistrationForm
 from models import Consulta, Medico, Paciente, User, db
 
 load_dotenv()
@@ -26,6 +27,19 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+
+@app.context_processor
+def utilitarios_template():
+    def static_url(filename):
+        caminho_absoluto = os.path.join(app.static_folder, filename)
+        try:
+            versao = int(os.path.getmtime(caminho_absoluto))
+        except OSError:
+            versao = 0
+        return url_for("static", filename=filename) + f"?v={versao}"
+
+    return {"static_url": static_url}
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -101,18 +115,22 @@ def agenda():
 
 @app.route("/api/agendamentos", methods=["GET"])
 def api_agendamentos():
-    termo = (request.args.get("q", default="", type=str) or "").strip()
+    termo = request.args.get("q", default="", type=str).strip()
 
     try:
-        query = Consulta.query.join(Paciente).join(Medico)
+        query = Consulta.query.outerjoin(Paciente).outerjoin(Medico)
 
         if termo:
+            termo_limpo = termo.replace(".", "").replace("-", "").strip()
             termo_like = f"%{termo}%"
+            termo_cpf_like = f"%{termo_limpo}%"
+
             query = query.filter(
-                db.or_(
-                    Paciente.nome.ilike(termo_like),
-                    Paciente.cpf.ilike(termo_like),
-                    Medico.nome.ilike(termo_like),
+                or_(
+                    Paciente.nome.like(termo_like),
+                    Paciente.cpf.like(termo_cpf_like),
+                    Medico.nome.like(termo_like),
+                    Medico.especialidade.like(termo_like)
                 )
             )
 
@@ -125,8 +143,8 @@ def api_agendamentos():
                 "cpf": c.paciente.cpf if c.paciente else "Não informado",
                 "medico": c.medico.nome if c.medico else "Não informado",
                 "especialidade": c.medico.especialidade if c.medico else "Não informado",
-                "data": c.data_hora.strftime("%d/%m/%Y"),
-                "horario": c.data_hora.strftime("%H:%M"),
+                "data": c.data_hora.strftime("%d/%m/%Y") if c.data_hora else "",
+                "horario": c.data_hora.strftime("%H:%M") if c.data_hora else "",
                 "convenio": c.paciente.convenio if c.paciente else "Particular",
                 "status": c.status,
             })
@@ -134,18 +152,11 @@ def api_agendamentos():
         return jsonify(dados), 200
 
     except Exception as e:
-        return jsonify({"erro": "Erro ao buscar agendamentos", "detalhes": str(e)}), 500
+        logging.error(f"Erro na API de busca: {e}")
+        return jsonify([]), 200
 
 
 def carregar_dados_terminal():
-    """
-    Requisito do desafio: 'A aplicação deverá entregar os dados quando iniciada
-    pelo terminal'. Busca os agendamentos via HTTP (mesmo endpoint usado pela
-    página /agenda) e exibe no terminal assim que o servidor estiver de pé.
-
-    Usa retry com pequenos intervalos em vez de um sleep fixo, porque o
-    momento exato em que o servidor Flask termina de subir pode variar.
-    """
     url = "http://127.0.0.1:5000/api/agendamentos"
     max_tentativas = 15
     intervalo_segundos = 1
@@ -176,28 +187,21 @@ def carregar_dados_terminal():
 
         time.sleep(intervalo_segundos)
 
-    logging.error(
-        "\n[ERRO NA API]: servidor não respondeu em %s tentativas\n" % max_tentativas
-    )
+    logging.error(f"\n[ERRO NA API]: Servidor não respondeu após {max_tentativas} tentativas\n")
 
 
 @app.cli.command("seed")
 def seed():
-    """Popula o banco com dados de teste (médicos, usuário, paciente e consultas)."""
     db.create_all()
 
     medico1 = Medico.query.filter_by(crm="12345/PB").first()
     if not medico1:
-        medico1 = Medico(
-            nome="Dr. Roberto Silva", crm="12345/PB", especialidade="Cardiologia"
-        )
+        medico1 = Medico(nome="Dr. Roberto Silva", crm="12345/PB", especialidade="Cardiologia")
         db.session.add(medico1)
 
     medico2 = Medico.query.filter_by(crm="67890/PB").first()
     if not medico2:
-        medico2 = Medico(
-            nome="Dra. Juliana Costa", crm="67890/PB", especialidade="Dermatologia"
-        )
+        medico2 = Medico(nome="Dra. Juliana Costa", crm="67890/PB", especialidade="Dermatologia")
         db.session.add(medico2)
 
     db.session.flush()
@@ -220,10 +224,9 @@ def seed():
         )
         db.session.add(paciente_teste)
         db.session.flush()
-        print("-> Usuário e Paciente de teste criados.")
+
     else:
         paciente_teste = Paciente.query.filter_by(user_id=user_teste.id).first()
-        print("-> Usuário de teste já existe no banco.")
 
     if paciente_teste and not Consulta.query.filter_by(paciente_id=paciente_teste.id).first():
         consulta1 = Consulta(
@@ -239,21 +242,11 @@ def seed():
             data_hora=datetime.now() + timedelta(days=5, hours=2),
         )
         db.session.add_all([consulta1, consulta2])
-        print("-> Consultas de teste criadas.")
 
     db.session.commit()
-    print("Base de dados populada com sucesso!")
-    print(f"-> Login de teste: {email_teste} / senha: 123456")
 
 
 def _deve_iniciar_thread_terminal() -> bool:
-    """
-    Evita que a thread de terminal seja disparada duas vezes quando o
-    reloader do Flask (debug=True) reinicia o processo. O Werkzeug seta
-    WERKZEUG_RUN_MAIN=true apenas no processo "real" que atende requisições.
-    Quando use_reloader=False (padrão aqui), essa variável não existe e a
-    thread sobe normalmente na primeira (e única) execução.
-    """
     return os.environ.get("WERKZEUG_RUN_MAIN") != "false"
 
 
