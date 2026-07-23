@@ -1,33 +1,41 @@
 # 🩺 Agenda Médica Web
 
-Uma aplicação web para gestão e visualização de agendamentos médicos, desenvolvida com Python (Flask) e banco de dados relacional PostgreSQL, totalmente conteinerizada com Docker.
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=for-the-badge&logo=flask&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+Uma aplicação web moderna para gestão e visualização de agendamentos médicos, desenvolvida em Python (Flask) e PostgreSQL, totalmente conteinerizada com Docker.
 
 ---
 
 ## 📝 Descrição Breve
 
-A **Agenda Médica** é um sistema projetado para facilitar o controle de consultas e o cadastro de pacientes e médicos. A plataforma conta com:
-- Autenticação de usuários (Login e Registro com senhas criptografadas e proteção CSRF).
-- Painel de visualização de agenda dinâmica com busca instantânea sem recarregar a página.
-- API RESTful integrada para consulta e filtragem de agendamentos.
-- Povoamento automático do banco de dados (*Seeding*) ao iniciar a aplicação.
+A **Agenda Médica Web** é uma solução intuitiva projetada para otimizar o fluxo de agendamento e acompanhamento de consultas. O sistema abrange:
+- **Autenticação Segura:** Login e registro de usuários com hash de senha via Werkzeug e proteção contra vulnerabilidades CSRF.
+- **Painel Dinâmico:** Visualização interativa dos agendamentos através de tabelas reativas com filtragem instantânea sem reload.
+- **Integração via API RESTful:** Endpoints expostos para busca e integração com sistemas externos.
+- **Povoamento Automático (*Seeding*):** Inicialização do banco de dados com massa de testes pronta para validação imediata.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Backend:** Python 3.11, Flask, Flask-SQLAlchemy (ORM), Flask-WTF / WTForms, Werkzeug (Security).
-* **Banco de Dados:** PostgreSQL 15, SQLAlchemy, Driver `psycopg2`.
-* **Frontend:** HTML5, CSS3, JavaScript (ES6+ Vanilla), Biblioteca **Tabulator.js**.
-* **Infraestrutura:** Docker, Docker Compose.
+| Camada | Tecnologias / Bibliotecas |
+| :--- | :--- |
+| **Backend** | Python 3.11, Flask, Flask-SQLAlchemy (ORM), Flask-WTF / WTForms, Werkzeug |
+| **Banco de Dados** | PostgreSQL 15, Driver `psycopg2-binary` |
+| **Frontend** | HTML5, CSS3, JavaScript (Vanilla ES6+), **Tabulator.js** |
+| **Infraestrutura** | Docker, Docker Compose |
 
 ---
 
-## 🔐 Configuração das Variáveis de Ambiente (.env)
+## 🔐 Configuração das Variáveis de Ambiente (`.env`)
 
-Antes de executar o projeto, você deve renomear o arquivo de exemplo para o nome correto que a aplicação utiliza:
+Antes de executar a aplicação, ajuste as variáveis de ambiente necessárias:
 
-1. Localize o arquivo `env-example` (ou `.env.example`) na raiz do projeto ou na pasta `AgendaMedica/`.
+1. Localize o arquivo de exemplo `env-example` (ou `.env.example`) na raiz do repositório ou no diretório `AgendaMedica/`.
 2. Renomeie o arquivo para `.env`:
    - **Linux / macOS:**
      ```bash
@@ -40,86 +48,70 @@ Antes de executar o projeto, você deve renomear o arquivo de exemplo para o nom
 
 ---
 
-## 🔑 Como Gerar uma SECRET_KEY Segura (Ambiente Virtual)
+## 🔑 Como Gerar uma `SECRET_KEY` Segura (Ambiente Virtual)
 
-Caso queira alterar a `SECRET_KEY` no seu arquivo `.env` por uma chave aleatória e segura, siga o passo a passo abaixo para criar/ativar um ambiente virtual (`venv`) e gerar a chave via Python:
+Para alterar a `SECRET_KEY` do arquivo `.env` por uma chave criptográfica forte, utilize um ambiente virtual temporário:
 
-### 🐧 No Linux / macOS:
+### 🐧 Linux / macOS:
 
-1. **Crie e ative o ambiente virtual:**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+```bash
+# 1. Crie e ative o ambiente virtual
+python3 -m venv .venv
+source .venv/bin/activate
 
-2. **Gere a chave secreta no terminal:**
-   ```bash
-   python3 -c "import secrets; print(secrets.token_hex(32))"
-   ```
+# 2. Gerar a chave secreta de 64 caracteres hexadecimais
+python3 -c "import secrets; print(secrets.token_hex(32))"
 
-3. **Copie a chave gerada e cole no seu arquivo `.env`:**
-   ```env
-   SECRET_KEY=sua_chave_gerada_aqui
-   ```
+# 3. Desative o ambiente virtual
+deactivate
+```
 
-4. **Desative o ambiente virtual:**
-   ```bash
-   deactivate
-   ```
+### 🪟 Windows (PowerShell):
 
-### 🪟 No Windows (PowerShell / Prompt de Comando):
+```powershell
+# 1. Crie e ative o ambiente virtual
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 
-1. **Crie e ative o ambiente virtual:**
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-   *(Nota: Se houver erro de permissão no PowerShell, execute primeiro: `Set-ExecutionPolicy Unrestricted -Scope Process`)*
+# 2. Gerar a chave secreta
+python -c "import secrets; print(secrets.token_hex(32))"
 
-2. **Gere a chave secreta no terminal:**
-   ```powershell
-   python -c "import secrets; print(secrets.token_hex(32))"
-   ```
+# 3. Desative o ambiente virtual
+deactivate
+```
 
-3. **Copie a chave gerada e cole no seu arquivo `.env`:**
-   ```env
-   SECRET_KEY=sua_chave_gerada_aqui
-   ```
-
-4. **Desative o ambiente virtual:**
-   ```powershell
-   deactivate
-   ```
+> **Nota para PowerShell:** Caso receba erro de execução de scripts, rode antes:  
+> `Set-ExecutionPolicy Unrestricted -Scope Process`
 
 ---
 
 ## 🐳 Instruções para Executar o Projeto com Docker
 
 ### Pré-requisitos
-- [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados no seu sistema.
+- [Docker Engine](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados.
 
 ### Passo a Passo
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/RageHTML/Agenda_Medica_TimerSaver
-   cd AgendaMedica
+   git clone https://github.com/RageHTML/Agenda_Medica_TimerSaver.git
+   cd Agenda_Medica_TimerSaver
    ```
 
-2. **Configure o arquivo de ambiente (`.env`):**
-   Certifique-se de ter renomeado o arquivo `env-example` para `.env` conforme instruído acima.
+2. **Configure o arquivo de ambiente:**
+   Certifique-se de que o arquivo `.env` foi criado a partir do `env-example`.
 
 3. **Suba os containers com Docker Compose:**
    ```bash
    docker compose up --build
    ```
-   *(O Docker baixará a imagem do Postgres, construirá a aplicação Flask e executará o script de `seed` automaticamente)*.
+   *(O Docker criará os serviços do PostgreSQL e do Flask, aplicando as migrações/seed automaticamente).*
 
 4. **Acesse no navegador:**
-   - **URL Principal:** `http://localhost:5000/agenda`
-   - **Tela de Login:** `http://localhost:5000/login`
+   - **Painel Principal:** [http://localhost:5000/agenda](http://localhost:5000/agenda)
+   - **Tela de Login:** [http://localhost:5000/login](http://localhost:5000/login)
 
-5. **Para encerrar a execução:**
+5. **Para encerrar e remover os containers:**
    ```bash
    docker compose down
    ```
@@ -128,7 +120,7 @@ Caso queira alterar a `SECRET_KEY` no seu arquivo `.env` por uma chave aleatóri
 
 ## 🔑 Credenciais do Usuário de Teste
 
-O banco de dados é populado automaticamente (*seeding*) na inicialização da aplicação. Você pode utilizar qualquer uma das credenciais abaixo para testar o login:
+A aplicação popula automaticamente o banco de dados com dados de teste (*seeding*). Utilize qualquer uma das credenciais abaixo para entrar no sistema:
 
 | Perfil | E-mail | Senha |
 | :--- | :--- | :--- |
@@ -140,31 +132,37 @@ O banco de dados é populado automaticamente (*seeding*) na inicialização da a
 
 ## 💡 Exemplos de Uso da Aplicação
 
-1. **Autenticação (`/login` e `/register`):**
-   - Formulários com validação de entradas e proteção contra ataques **CSRF**.
-   - Senhas armazenadas de forma segura com *hash* Werkzeug.
+1. **Autenticação de Usuários (`/login` e `/register`):**
+   - Validação de formulários e senhas armazenadas como hash seguro via Werkzeug (`generate_password_hash`).
+   - Proteção CSRF ativa em todas as requisições de formulário.
 
-2. **Tabela de Agendamentos (`/agenda`):**
-   - Exibe a lista completa de consultas através da biblioteca **Tabulator.js**.
-   - Exibição de badges visuais para diferentes estados (*Agendada*, *Confirmada*, *Realizada*, *Cancelada*).
+2. **Tabela Dinâmica de Consultas (`/agenda`):**
+   - Renderização reativa utilizando a biblioteca **Tabulator.js**.
+   - Badges visuais indicando o status das consultas (*Agendada*, *Confirmada*, *Realizada*, *Cancelada*).
 
-3. **Busca Reativa e Debounce:**
-   - Permite filtrar consultas em tempo real por **Nome do Paciente**, **CPF**, **Médico** ou **Especialidade**.
-   - O campo de busca utiliza **Debounce (300ms)** em JavaScript para otimizar as requisições ao backend.
+3. **Busca Reativa com Debounce:**
+   - Campo de busca em tempo real com técnica de **Debounce (300ms)** em JS para otimização de chamadas ao backend.
+   - Suporte a filtros combinados: Nome do Paciente, CPF, Médico ou Especialidade.
 
-4. **API de Consulta (`GET /api/agendamentos`):**
-   - Retorno JSON com todos os agendamentos: `http://localhost:5000/api/agendamentos`
-   - Consulta filtrada via parâmetro query: `http://localhost:5000/api/agendamentos?q=Cardiologia`
+4. **API RESTful de Agendamentos (`GET /api/agendamentos`):**
+   - Obter todos os agendamentos (JSON):
+     ```http
+     GET http://localhost:5000/api/agendamentos
+     ```
+   - Filtrar agendamentos por termo de busca:
+     ```http
+     GET http://localhost:5000/api/agendamentos?q=Cardiologia
+     ```
 
 ---
 
 ## 📐 Decisões Técnicas e Limitações Conhecidas
 
 ### Decisões Técnicas
-- **Isolamento de Porta PostgreSQL:** O container do banco foi mapeado externamente para a porta `5433:5432` no `docker-compose.yml`, prevenindo conflitos com serviços locais do Postgres na máquina host (porta `5432`).
-- **Comunicação por Nome de Serviço:** A aplicação Flask acessa o banco via hostname da rede interna do Docker (`@db:5432`), eliminando a necessidade de mapear IPs dinâmicos.
-- **Cache-Busting para Arquivos Estáticos:** Implementação da função utilitária `static_url` no Flask, injetando uma query string de versão (`?v=TIMESTAMP`) baseada na última modificação do arquivo para evitar que o navegador sirva CSS/JS desatualizado.
+- **Isolamento de Porta PostgreSQL:** Mapeamento da porta externa do banco para `5433:5432` no `docker-compose.yml`, evitando conflitos com instâncias locais do Postgres na máquina do desenvolvedor.
+- **Comunicação Interna de Containers:** O Flask conecta-se ao banco via DNS da rede interna Docker (`db:5432`), abstraindo IPs voláteis.
+- **Prevencao de Cache de Assets (Cache-Busting):** Função utilitária no Flask injetando parâmetros de timestamp (`?v=TIMESTAMP`) em arquivos CSS/JS estáticos.
 
 ### Limitações Conhecidas
-- **Gerenciamento de Sessão:** A sessão do usuário é gerenciada via *session cookies* nativos do Flask. Para escalar horizontalmente com múltiplas instâncias em produção, recomenda-se adotar um armazenamento compartilhado como o *Redis*.
-- **Comando de Seed na Subida:** O comando `seed` é executado diretamente na inicialização do container web (`command: sh -c ...`). Em ambientes de produção de larga escala, o ideal é rodar o script em um job isolado no pipeline de deploy para evitar *race conditions*.
+- **Sessões Locais em Cookie:** Uso de *session cookies* nativos do Flask. Em cenários de escalabilidade horizontal com múltiplas instâncias, recomenda-se integrar o **Redis** como backend de sessão.
+- **Execução do Seed no Boot:** O comando de *seed* é disparado durante a subida do container da aplicação web. Para ambientes produtivos, o povoamento deve ser isolado na esteira de CI/CD para evitar *race conditions*.
