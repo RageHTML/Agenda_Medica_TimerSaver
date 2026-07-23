@@ -17,13 +17,39 @@ document.addEventListener("DOMContentLoaded", function () {
         return '<span class="' + classe + '">' + valor + "</span>";
     }
 
+    // Função auxiliar robusta para converter string de data em carimbo numérico (Timestamp)
+    function parseDataParaOrdem(valorStr) {
+        if (!valorStr) return 0;
+        var s = valorStr.toString().trim();
+        
+        // Se estiver no formato brasileiro DD/MM/YYYY ou DD/MM/YYYY HH:mm
+        if (/^\d{2}\/\d{2}\/\d{4}/.test(s)) {
+            var partes = s.split(" ")[0].split("/");
+            var hora = s.split(" ")[1] || "00:00:00";
+            return new Date(partes[2] + "-" + partes[1] + "-" + partes[0] + "T" + hora).getTime();
+        }
+        
+        // Se estiver no formato padrão ISO YYYY-MM-DD
+        return new Date(s).getTime() || 0;
+    }
+
     var table = new Tabulator("#tabela-agendamentos", {
         data: window.AGENDAMENTOS_DATA || [],
         layout: "fitColumns",
         responsiveLayout: "collapse",
         placeholder: "Nenhum registro encontrado.",
         columns: [
-            { title: "Data", field: "data", width: 110, sorter: "date", sorterParams: { format: "dd/MM/yyyy" } },
+            { 
+                title: "Data", 
+                field: "data", 
+                width: 110, 
+                // Sorter customizado para garantir que ordene perfeitamente independente do formato da API
+                sorter: function(a, b, aRow, bRow, column, dir, sorterParams) {
+                    var t1 = parseDataParaOrdem(a);
+                    var t2 = parseDataParaOrdem(b);
+                    return t1 - t2;
+                }
+            },
             { title: "Horário", field: "horario", width: 90 },
             { title: "Paciente", field: "paciente", minWidth: 160, responsive: 0 },
             { title: "CPF", field: "cpf", width: 130 },
