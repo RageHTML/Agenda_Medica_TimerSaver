@@ -1,6 +1,6 @@
 # 🩺 Agenda Médica Web
 
-Uma aplicação web moderna para gestão e visualização de agendamentos médicos, desenvolvida em Python (Flask) e PostgreSQL, totalmente conteinerizada com Docker.
+Uma aplicação web moderna para gestão e visualização de agendamentos médicos, desenvolvida em Python (Flask) e MySQL, totalmente conteinerizada com Docker.
 
 ---
 
