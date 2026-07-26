@@ -55,7 +55,7 @@ Rename-Item env-example .env
 
 
 
-### 🔑 Como Gerar uma `SECRET_KEY` Segura
+### 5. 🔑 Como Gerar uma `SECRET_KEY` Segura
 
 Para gerar uma chave criptográfica forte para a variável `SECRET_KEY` no arquivo `.env`, utilize os comandos abaixo com um ambiente virtual temporário:
 
@@ -83,7 +83,24 @@ deactivate
 
 ---
 
-## 🐳 5. Como Executar via Docker
+### 6. 🚀 Como executar sem Docker
+
+
+2. **Navegue até o diretório onde está o arquivo `app.py`:**
+```bash
+    cd AgendaMedica
+```
+
+3. **Inicie a aplicação:**
+```bash
+flask run
+```
+
+*(Caso o comando `flask run` não encontre a aplicação automaticamente, especifique o arquivo com `flask --app app run`)
+
+---
+
+## 7. 🐳 . Como Executar via Docker
 
 Para rodar a aplicação completa conteinerizada utilizando o Docker e o Docker Compose, siga os passos abaixo:
 
@@ -105,7 +122,7 @@ docker compose up --build
 
 ---
 
-## 🌐 6. Rotas e Acesso à Aplicação
+## 🌐 8. Rotas e Acesso à Aplicação
 
 Assim que a aplicação estiver rodando, você poderá acessar as principais rotas e endpoints através da tabela abaixo:
 
@@ -119,7 +136,7 @@ Assim que a aplicação estiver rodando, você poderá acessar as principais rot
 
 ---
 
-## 🌱 7. Como Popular o Banco de Dados (Flask Seed)
+## 🌱 9. Como Popular o Banco de Dados (Flask Seed)
 
 O sistema conta com um comando dedicado para popular o banco de dados com massa de testes.
 
@@ -132,7 +149,7 @@ flask seed
 
 ---
 
-## 🧪 8. Como Executar os Testes Automatizados (Pytest)
+## 🧪 10. Como Executar os Testes Automatizados (Pytest)
 
 O projeto possui uma suíte de testes automatizados utilizando **Pytest** e o cliente de testes integrado do Flask (`app.test_client()`), operando sobre um banco de dados em memória (`SQLite`).
 
@@ -156,7 +173,7 @@ pytest -s
 
 ---
 
-## 📌 9. Considerações Finais / Autor
+## 📌 11. Considerações Finais / Autor
 
 Projeto desenvolvido com foco em boas práticas de desenvolvimento web backend em Python, testes automatizados e arquitetura conteinerizada.
 
